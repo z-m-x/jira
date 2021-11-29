@@ -50,6 +50,9 @@
     "husky": "^7.0.0",
     "prettier": "^2.5.0"
   },
+  "lint-staged": {
+    "*.{js,css,md,ts,tsx}": "prettier --write"
+  },
   "msw": {
     "workerDirectory": "public"
   }
