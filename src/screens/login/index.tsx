@@ -1,9 +1,27 @@
 import React, { useCallback, FormEvent } from 'react'
+import { cleanUrlEmptyObject } from '../../utils'
+
+const BaseUrl = process.env.REACT_APP_API_URL
+
 export const LoginScreen = () => {
+  const login = (param: { username: string; password: string }) => {
+    fetch(`${BaseUrl}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanUrlEmptyObject(param))
+    }).then(async (res) => {
+      if (res.ok) {
+        await res.json()
+      }
+    })
+  }
   const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const username = (event.currentTarget.elements[0] as HTMLInputElement).value
     const password = (event.currentTarget.elements[1] as HTMLInputElement).value
+    login({ password, username })
   }, [])
   return (
     <form action="" method="post" onSubmit={handleSubmit}>

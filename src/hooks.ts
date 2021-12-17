@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
-export function useDebounce(value: any, time: number) {
+
+export function useMount(callback: () => any) {
+  useEffect(() => {
+    callback()
+  }, [])
+}
+export function useDebounce<T>(value: T, time?: number): T {
   const [deValue, setDeValue] = useState(value)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -12,7 +18,7 @@ export function useDebounce(value: any, time: number) {
   return deValue
 }
 
-export function useDebounce2(callback: () => void, time: number) {
+export function useDebounce2(callback: () => void, time?: number) {
   useEffect(() => {
     const timer = setTimeout(() => {
       callback()
