@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react'
 
 export function useMount(callback: () => any) {
+  const [isMount, setIsMount] = useState(true)
   useEffect(() => {
-    callback()
-  }, [])
+    if (isMount) {
+      callback()
+    }
+    return () => {
+      setIsMount(false)
+    }
+  })
+  //setIsMount(false)//写在这里，会导致无限render
 }
 export function useDebounce<T>(value: T, time?: number): T {
   const [deValue, setDeValue] = useState(value)

@@ -1,14 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
+import { AppProviders } from './context'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { loadDevTools } from 'jira-dev-tool'
+import 'antd/dist/antd.less' //引入之后用于修改antd样式
+
 loadDevTools(() => {
   ReactDOM.render(
-    <React.StrictMode>
+    <AppProviders>
       <App />
-    </React.StrictMode>,
+    </AppProviders>,
     document.getElementById('root')
   )
 })

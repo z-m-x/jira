@@ -2,36 +2,31 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 
 import { useMount, useDebounce } from '../../hooks'
+import { useHttp } from '../../utils/http'
 import { SearchPanel } from './search-panel'
 import { List } from './list'
 import { cleanUrlEmptyObject } from '../../utils'
-import qs from 'qs'
-const BaseUrl = process.env.REACT_APP_API_URL
 
 export const ProjectListScreen = () => {
+  const client = useHttp()
+
   const [users, setUsers] = useState([])
 
   const [param, setParam] = useState({
     name: '',
     personId: ''
   })
+
+  const formValues = useDebounce(param, 500)
   const [list, setList] = useState([])
 
   useEffect(() => {
-    fetch(
-      `${BaseUrl}/projects?${qs.stringify(cleanUrlEmptyObject(param))}`
-    ).then(async (res) => {
-      if (res.ok) {
-        setList(await res.json())
-      }
-    })
-  }, [param])
+    client('projects', {
+      data: cleanUrlEmptyObject(formValues)
+    }).then(setList)
+  }, [formValues])
   useMount(() => {
-    fetch('').then(async (res) => {
-      if (res.ok) {
-        setUsers(await res.json())
-      }
-    })
+    client('users').then(setUsers)
   })
   return (
     <div>

@@ -1,12 +1,14 @@
 import React, { useContext, useState } from 'react'
+import { useMount } from '../hooks'
 import { ReactNode } from 'react'
 import * as auth from '../auth-provider'
+import { http } from '../utils/http'
 import { User } from '../screens/project-list/search-panel'
 const AuthContext = React.createContext<
   | {
       login: (loginForm: AuthForm) => Promise<void>
       register: (loginForm: AuthForm) => Promise<void>
-      loginout: () => Promise<void>
+      logout: () => Promise<void>
       user: User | null
     }
   | undefined
@@ -16,20 +18,31 @@ interface AuthForm {
   username: string
   password: string
 }
+
+/* 用于刷新页面，AuthContext内的user初始化 */
+const bootstrapUser = async () => {
+  let user = null
+  const token = auth.getToken()
+  if (token) {
+    const data = await http('me', { token })
+    user = data.user
+  }
+  return user
+}
+
 /* 封装用户Provider 将用户相关数据和操作封装传递到应用子组件*/
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
-  const login = (loginForm: AuthForm) =>
-    auth.login(loginForm).then((res) => setUser(res))
-
-  const register = (loginForm: AuthForm) =>
-    auth.register(loginForm).then((res) => setUser(res))
-
-  const loginout = () => auth.logout().then(() => setUser(null))
-
+  const login = (form: AuthForm) => auth.login(form).then(setUser)
+  const register = (form: AuthForm) => auth.register(form).then(setUser)
+  const logout = () => auth.logout().then(() => setUser(null))
+  /* 初始化user */
+  useMount(() => {
+    bootstrapUser().then(setUser)
+  })
   return (
     <AuthContext.Provider
-      value={{ login, register, loginout, user }}
+      value={{ login, register, logout, user }}
       children={children}
     ></AuthContext.Provider>
   )
@@ -39,7 +52,7 @@ export default AuthProvider
 export const useAuth = () => {
   const authContext = useContext(AuthContext)
   if (!authContext) {
-    throw new Error('useAuth必须在AuthContext.Provider包裹中使用')
+    throw new Error('useAuth必须在AuthProvider包裹中使用')
   }
   return authContext
 }
