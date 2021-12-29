@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react'
 import { useAuth } from '../context/auth-context'
+import { LongButton } from './index'
 
-import { Form, Input, Button } from 'antd'
+import { Form, Input } from 'antd'
 
 export const RegisterScreen = () => {
   const { register } = useAuth()
@@ -29,9 +30,9 @@ export const RegisterScreen = () => {
           <Input placeholder={'密码'} />
         </Form.Item>
         <Form.Item>
-          <Button htmlType={'submit'} type="primary">
+          <LongButton htmlType={'submit'} type="primary">
             注册
-          </Button>
+          </LongButton>
         </Form.Item>
       </Form>
     </>
