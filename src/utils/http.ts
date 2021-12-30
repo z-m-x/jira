@@ -1,6 +1,6 @@
 import qs from 'qs'
 import * as auth from '../auth-provider'
-import { cleanUrlEmptyObject } from './index'
+// import { cleanUrlEmptyObject } from './index'
 import { useAuth } from '../context/auth-context'
 const BaseUrl = process.env.REACT_APP_API_URL
 interface Config extends RequestInit {
@@ -15,10 +15,10 @@ export const http = async (
 ) => {
   const config = {
     method: 'GET',
-    headers: cleanUrlEmptyObject({
+    headers: {
       Authorization: token ? `Bearer ${token}` : '',
       'Content-type': data ? 'application/json' : ''
-    }),
+    },
     ...customConfig
   }
   if (config.method.toUpperCase() === 'GET') {

@@ -1,7 +1,10 @@
 import React from 'react'
+import { ReactComponent as SoftwareLogo } from './assets/software-logo.svg'
 import { useAuth } from './context/auth-context'
 import { ProjectListScreen } from './screens/project-list'
 import styled from '@emotion/styled'
+import { Dropdown, Menu, Button } from 'antd'
+import { Row } from './components/lib'
 /**
  * grid 和 flex 各自的应用场景
  * 1. 要考虑，是一维布局 还是 二维布局
@@ -15,17 +18,31 @@ import styled from '@emotion/styled'
  */
 /* 用户已登录的面板 */
 export const AuthenticatedApp = () => {
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   return (
     <Container>
-      <Header>
-        <HeaderLeft>
-          <h3>Logo</h3>
-          <h3>项目</h3>
-          <h3>用户</h3>
+      <Header between={true}>
+        <HeaderLeft gap={true}>
+          <SoftwareLogo width={'18rem'} color={'rgb(38, 132, 255)'} />
+          <h2>项目</h2>
+          <h2>用户</h2>
         </HeaderLeft>
         <HeaderRight>
-          <button onClick={logout}>登出</button>
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key={'logout'}>
+                  <Button onClick={logout} type={'link'}>
+                    登出
+                  </Button>
+                </Menu.Item>
+              </Menu>
+            }
+          >
+            <Button type={'link'} onClick={(e) => e.preventDefault()}>
+              Hi, {user?.name}
+            </Button>
+          </Dropdown>
         </HeaderRight>
       </Header>
 
@@ -38,16 +55,11 @@ export const AuthenticatedApp = () => {
 const Container = styled.div`
   height: 100vh;
 `
-const Header = styled.header`
-  grid-area: header;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+const Header = styled(Row)`
+  padding: 3.2rem;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1;
 `
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-`
+const HeaderLeft = styled(Row)``
 const HeaderRight = styled.div``
 const Main = styled.main``

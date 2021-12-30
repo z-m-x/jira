@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom'
 import { AppProviders } from './context'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
-import { loadDevTools } from 'jira-dev-tool'
+import { DevTools, loadServer } from 'jira-dev-tool'
 import 'antd/dist/antd.less' //引入之后用于修改antd样式
 
-loadDevTools(() => {
+loadServer(() => {
   ReactDOM.render(
     <AppProviders>
+      <DevTools />
       <App />
     </AppProviders>,
     document.getElementById('root')

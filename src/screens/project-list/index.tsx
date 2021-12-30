@@ -1,3 +1,5 @@
+import styled from '@emotion/styled'
+
 import React from 'react'
 import { useState, useEffect } from 'react'
 
@@ -24,18 +26,25 @@ export const ProjectListScreen = () => {
     client('projects', {
       data: cleanUrlEmptyObject(formValues)
     }).then(setList)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues])
+
   useMount(() => {
     client('users').then(setUsers)
   })
   return (
-    <div>
+    <Container>
+      <h2>项目列表</h2>
       <SearchPanel
         param={param}
         setParam={setParam}
         users={users}
       ></SearchPanel>
       <List list={list} users={users}></List>
-    </div>
+    </Container>
   )
 }
+
+const Container = styled.div`
+  padding: 3.2rem;
+`

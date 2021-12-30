@@ -15,12 +15,12 @@ export const UnauthenticatedApp = () => {
       <Header />
       <Background />
       <ShadowCard>
-        <Title>{switchScreen ? '请注册' : '请登录'}</Title>
+        <Title>{switchScreen ? '请登录' : '请注册'}</Title>
         {switchScreen ? <LoginScreen /> : <RegisterScreen />}
         <Divider />
-        <a onClick={() => setSwitchScreen(!switchScreen)}>
-          {switchScreen ? '已经有账号了？直接登录' : '没有账号？注册新账号'}
-        </a>
+        <Button onClick={() => setSwitchScreen(!switchScreen)}>
+          {switchScreen ? '没有账号？注册新账号' : '已经有账号了？直接登录'}
+        </Button>
       </ShadowCard>
     </Container>
   )
