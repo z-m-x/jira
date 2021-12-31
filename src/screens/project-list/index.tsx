@@ -1,46 +1,43 @@
 import styled from '@emotion/styled'
 
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-import { useMount, useDebounce } from '../../hooks'
-import { useHttp } from '../../utils/http'
+import { useDebounce } from '../../utils'
+import { useProject } from '../../utils/project'
+import { useUser } from '../../utils/user'
+
 import { SearchPanel } from './search-panel'
 import { List } from './list'
-import { cleanUrlEmptyObject } from '../../utils'
+import { Typography } from 'antd'
 
 export const ProjectListScreen = () => {
-  const client = useHttp()
-
-  const [users, setUsers] = useState([])
-
   const [param, setParam] = useState({
     name: '',
     personId: ''
   })
 
   const formValues = useDebounce(param, 500)
-  const [list, setList] = useState([])
 
-  useEffect(() => {
-    client('projects', {
-      data: cleanUrlEmptyObject(formValues)
-    }).then(setList)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues])
+  const { isLoading, error, data: list } = useProject(formValues)
 
-  useMount(() => {
-    client('users').then(setUsers)
-  })
+  const { data: users } = useUser()
   return (
     <Container>
       <h2>项目列表</h2>
       <SearchPanel
         param={param}
         setParam={setParam}
-        users={users}
+        users={users || []}
       ></SearchPanel>
-      <List list={list} users={users}></List>
+      {error && (
+        <Typography.Text type={'danger'}>{error.message}</Typography.Text>
+      )}
+      <List
+        loading={isLoading}
+        dataSource={list || []}
+        users={users || []}
+      ></List>
     </Container>
   )
 }
