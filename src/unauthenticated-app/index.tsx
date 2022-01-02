@@ -5,18 +5,25 @@ import styled from '@emotion/styled'
 import logo from '../assets/logo.svg'
 import left from '../assets/left.svg'
 import right from '../assets/right.svg'
-import { Card, Button, Divider } from 'antd'
+import { Card, Button, Divider, Typography } from 'antd'
 /* 用户未登录的面板 */
 export const UnauthenticatedApp = () => {
   const [switchScreen, setSwitchScreen] = useState(true)
-
+  const [error, setError] = useState<Error | null>(null)
   return (
     <Container>
       <Header />
       <Background />
       <ShadowCard>
         <Title>{switchScreen ? '请登录' : '请注册'}</Title>
-        {switchScreen ? <LoginScreen /> : <RegisterScreen />}
+        {error ? (
+          <Typography.Text type={'danger'}>{error.message}</Typography.Text>
+        ) : null}
+        {switchScreen ? (
+          <LoginScreen onError={setError} />
+        ) : (
+          <RegisterScreen onError={setError} />
+        )}
         <Divider />
         <Button onClick={() => setSwitchScreen(!switchScreen)}>
           {switchScreen ? '没有账号？注册新账号' : '已经有账号了？直接登录'}

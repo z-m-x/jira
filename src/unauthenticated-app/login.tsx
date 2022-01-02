@@ -2,14 +2,26 @@ import React, { useCallback } from 'react'
 import { useAuth } from '../context/auth-context'
 import { LongButton } from './index'
 import { Form, Input } from 'antd'
+import { useAsync } from '../utils/use-async'
 
-export const LoginScreen = () => {
+export const LoginScreen = ({
+  onError
+}: {
+  onError: (error: Error) => void
+}) => {
   const { login } = useAuth()
 
+  const { run, isLoading } = useAsync(undefined, { throwOnError: true })
+
   const handleSubmit = useCallback(
-    (values: { username: string; password: string }) => {
-      login(values)
+    async (values: { username: string; password: string }) => {
+      try {
+        await run(login(values))
+      } catch (e) {
+        onError(e as Error)
+      }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [login]
   )
 
@@ -29,7 +41,7 @@ export const LoginScreen = () => {
           <Input placeholder={'密码'} />
         </Form.Item>
         <Form.Item>
-          <LongButton htmlType={'submit'} type="primary">
+          <LongButton loading={isLoading} htmlType={'submit'} type="primary">
             登录
           </LongButton>
         </Form.Item>
