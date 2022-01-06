@@ -10,12 +10,15 @@ import { useUser } from '../../utils/user'
 import { SearchPanel } from './search-panel'
 import { List } from './list'
 import { Typography } from 'antd'
+import { useUrlQueryParams } from '../../utils/url'
 
 export const ProjectListScreen = () => {
-  const [param, setParam] = useState({
-    name: '',
-    personId: ''
-  })
+  // const [, setParam] = useState({
+  //   name: '',
+  //   personId: ''
+  // })
+
+  const [param, setParam] = useUrlQueryParams(['name', 'personId'])
 
   const formValues = useDebounce(param, 500)
 
@@ -41,6 +44,8 @@ export const ProjectListScreen = () => {
     </Container>
   )
 }
+
+ProjectListScreen.whyDidYouRender = true
 
 const Container = styled.div`
   padding: 3.2rem;
