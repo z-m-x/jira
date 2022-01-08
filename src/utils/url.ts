@@ -12,8 +12,8 @@ export const useUrlQueryParams = <K extends string>(queryKeys: K[]) => {
           //基础内置hook依赖项对比如果是内置hook创建出来的话内部就不会认为改变了也不会重新执行hook；
 
           return { ...pre, [key]: searchParams.get(key) || '' }
-          //eslint-disable-next-line react-hooks/exhaustive-deps
         }, {} as { [key in K]: string }),
+      //eslint-disable-next-line react-hooks/exhaustive-deps
       [searchParams]
     ),
 

@@ -4,7 +4,7 @@ import { cleanUrlEmptyObject } from './index'
 import { User } from '../screens/project-list/search-panel'
 import { useEffect } from 'react'
 
-export const useUser = (param?: Partial<User>) => {
+export const useUsers = (param?: Partial<User>) => {
   const client = useHttp()
 
   const { run, ...rest } = useAsync<User[]>()

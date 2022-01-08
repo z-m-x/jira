@@ -1,16 +1,15 @@
 import styled from '@emotion/styled'
 
 import React from 'react'
-import { useState } from 'react'
 
 import { useDebounce } from '../../utils'
-import { useProject } from '../../utils/project'
-import { useUser } from '../../utils/user'
+import { useProjects } from '../../utils/project'
+import { useUsers } from '../../utils/user'
 
 import { SearchPanel } from './search-panel'
 import { List } from './list'
 import { Typography } from 'antd'
-import { useUrlQueryParams } from '../../utils/url'
+import { useProjectSearchParams } from './utils'
 
 export const ProjectListScreen = () => {
   // const [, setParam] = useState({
@@ -18,13 +17,11 @@ export const ProjectListScreen = () => {
   //   personId: ''
   // })
 
-  const [param, setParam] = useUrlQueryParams(['name', 'personId'])
+  const [param, setParam] = useProjectSearchParams()
 
-  const formValues = useDebounce(param, 500)
+  const { isLoading, error, data: list } = useProjects(useDebounce(param, 500))
 
-  const { isLoading, error, data: list } = useProject(formValues)
-
-  const { data: users } = useUser()
+  const { data: users } = useUsers()
   return (
     <Container>
       <h2>项目列表</h2>
@@ -45,7 +42,7 @@ export const ProjectListScreen = () => {
   )
 }
 
-ProjectListScreen.whyDidYouRender = true
+ProjectListScreen.whyDidYouRender = false
 
 const Container = styled.div`
   padding: 3.2rem;

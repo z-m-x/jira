@@ -4,7 +4,7 @@ import { cleanUrlEmptyObject } from './index'
 import type { Project } from '../screens/project-list/list'
 import { useEffect } from 'react'
 
-export const useProject = (param?: Partial<Project>) => {
+export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp()
 
   const { run, ...rest } = useAsync<Project[]>()

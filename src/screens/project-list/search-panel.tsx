@@ -3,9 +3,11 @@ import { jsx } from '@emotion/react'
 
 import React from 'react'
 
-import { Input, Select, Form } from 'antd'
+import { Input, Form } from 'antd'
+import { Project } from './list'
+import { UserSelect } from '../../components/user-select'
 export interface User {
-  id: string
+  id: number
   name: string
   email: string
   title: string
@@ -13,7 +15,7 @@ export interface User {
   organization: string
 }
 interface SearchPanelProps {
-  param: { name: string; personId: string }
+  param: Partial<Pick<Project, 'name' | 'personId'>> //Partial之后就允许把undefined赋值给字段
   setParam: (param: SearchPanelProps['param']) => void
   users: User[]
 }
@@ -30,19 +32,13 @@ export const SearchPanel = ({ param, setParam, users }: SearchPanelProps) => {
         />
       </Form.Item>
       <Form.Item>
-        <Select
+        <UserSelect
           value={param.personId}
           onChange={(value) => {
             setParam({ ...param, personId: value })
           }}
-        >
-          <Select.Option value={''}>负责人</Select.Option>
-          {users.map((user) => (
-            <Select.Option key={user.id} value={`${user.id}`}>
-              {user.name}
-            </Select.Option>
-          ))}
-        </Select>
+          defaultOptionName={'负责人'}
+        />
       </Form.Item>
     </Form>
   )
