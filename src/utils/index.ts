@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // export const cleanUrlEmptyObject = (object: object) => { 读取值会报错因为object可以是function、字面量对象、实例对象，所以通过解构创建新对象会导致结果的类型被定义{}；
 export const cleanUrlEmptyObject = (object: { [key: string]: unknown }) => {
@@ -45,4 +45,20 @@ export function useDebounce2(callback: () => void, time?: number) {
       clearTimeout(timer)
     }
   }, [callback, time])
+}
+
+/**
+ * 返回组件的挂载状态，如果还没挂载或者已经卸载，返回false；反之，返回true
+ */
+export const useMountedRef = () => {
+  const mountedRef = useRef(false)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  })
+
+  return mountedRef
 }

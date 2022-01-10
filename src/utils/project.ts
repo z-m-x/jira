@@ -8,12 +8,16 @@ export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp()
 
   const { run, ...rest } = useAsync<Project[]>()
+
+  const fetchProjects = () =>
+    client('projects', {
+      data: cleanUrlEmptyObject(param || {})
+    })
+
   useEffect(() => {
-    run(
-      client('projects', {
-        data: cleanUrlEmptyObject(param || {})
-      })
-    )
+    run(fetchProjects(), {
+      retry: fetchProjects
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [param])
 
