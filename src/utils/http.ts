@@ -1,4 +1,5 @@
 import qs from 'qs'
+import { useCallback } from 'react'
 import * as auth from '../auth-provider'
 // import { cleanUrlEmptyObject } from './index'
 import { useAuth } from '../context/auth-context'
@@ -46,6 +47,9 @@ export const http = async (
 export const useHttp = () => {
   const { user } = useAuth()
   /* 这里写出数组和展开是为了使用 Parameters操作符 和 调用函数时参数传递方式不改变*/
-  return (...[endpoint, config]: Parameters<typeof http>) =>
-    http(endpoint, { ...config, token: user?.token })
+  return useCallback(
+    (...[endpoint, config]: Parameters<typeof http>) =>
+      http(endpoint, { ...config, token: user?.token }),
+    [user?.token]
+  )
 }

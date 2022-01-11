@@ -21,8 +21,7 @@ export const LoginScreen = ({
         onError(e as Error)
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [login]
+    [login, run, onError]
   )
 
   return (

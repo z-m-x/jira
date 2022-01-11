@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useMountedRef } from '.'
 
 interface State<D> {
@@ -33,53 +33,59 @@ export const useAsync = <D>(
     ...initialState
   })
 
-  const setData = (data: D) =>
-    setState({
-      data,
-      error: null,
-      stat: 'success'
-    })
+  const setData = useCallback(
+    (data: D) =>
+      setState({
+        data,
+        error: null,
+        stat: 'success'
+      }),
+    []
+  )
 
-  const setError = (error: Error) =>
-    setState({
-      error,
-      data: null,
-      stat: 'error'
-    })
+  const setError = useCallback(
+    (error: Error) =>
+      setState({
+        error,
+        data: null,
+        stat: 'error'
+      }),
+    []
+  )
   //runConfig?:{retry:()=>Promise<D>} 为什么还需要把请求的Promise通过函数传入？因为外界调用run函数传入一个Promise已经被执行了，然后将返回的结果当成参数传入了run；
-  const run = (
-    promise: Promise<D>,
-    runConfig?: { retry: () => Promise<D> }
-  ) => {
-    setState({
-      ...state,
-      stat: 'loading'
-    })
+  const run = useCallback(
+    (promise: Promise<D>, runConfig?: { retry: () => Promise<D> }) => {
+      setState((preState) => ({
+        ...preState,
+        stat: 'loading'
+      }))
 
-    if (!promise || !promise.then) {
-      throw new Error('请传入Promise')
-    }
-    if (runConfig?.retry) {
-      //存储本次的异步函数
-      setRetry(() => () => run(runConfig?.retry(), runConfig))
-    }
+      if (!promise || !promise.then) {
+        throw new Error('请传入Promise')
+      }
+      if (runConfig?.retry) {
+        //存储本次的异步函数
+        setRetry(() => () => run(runConfig?.retry(), runConfig))
+      }
 
-    return promise
-      .then((data) => {
-        //异步在组件卸载时还未终止，异步结果回来后对已卸载组件状态做出操作，会触发以下错误
-        /*
+      return promise
+        .then((data) => {
+          //异步在组件卸载时还未终止，异步结果回来后对已卸载组件状态做出操作，会触发以下错误
+          /*
           Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
         */
-        if (mountedRef) setData(data)
-        return data
-      })
-      .catch((error) => {
-        //catch会消化异常，如果不主动抛出，外面接受不到异常
-        setError(error)
-        if (config.throwOnError) return Promise.reject(error)
-        return error
-      })
-  }
+          if (mountedRef) setData(data)
+          return data
+        })
+        .catch((error) => {
+          //catch会消化异常，如果不主动抛出，外面接受不到异常
+          setError(error)
+          if (config.throwOnError) return Promise.reject(error)
+          return error
+        })
+    },
+    [config.throwOnError, mountedRef, setData, setError]
+  )
 
   return {
     isIdle: state.stat === 'idle',

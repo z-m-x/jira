@@ -32,8 +32,7 @@ export const RegisterScreen = ({
         onError(e as Error)
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [register]
+    [register, onError, run]
   )
 
   return (
