@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useReducer, useState } from 'react'
 import { useMountedRef } from '.'
 
 interface State<D> {
@@ -15,6 +15,16 @@ const defaultInitialState: State<null> = {
 const defaultConfig = {
   throwOnError: false
 }
+
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+  //封装组件卸载时setState的动作
+  const mountedRef = useMountedRef()
+  return useCallback(
+    (...args: T[]) => (mountedRef.current ? dispatch(...args) : void 0),
+    [mountedRef, dispatch]
+  )
+}
+
 export const useAsync = <D>(
   initialState?: State<D>,
   initialConfig?: typeof defaultConfig
@@ -24,41 +34,38 @@ export const useAsync = <D>(
     ...initialConfig
   }
 
-  const mountedRef = useMountedRef()
-
   const [retry, setRetry] = useState(() => () => {}) //缓存本次异步函数
 
-  const [state, setState] = useState<State<D>>({
-    ...defaultInitialState,
-    ...initialState
-  })
+  const [state, dispatch] = useReducer(
+    (state: State<D>, action: Partial<State<D>>) => ({ ...state, ...action }),
+    { ...defaultInitialState, ...initialState }
+  ) //第一个回调可以自定义，常规的action是一个type,value属性的对象
+
+  const safeDispatch = useSafeDispatch(dispatch)
 
   const setData = useCallback(
     (data: D) =>
-      setState({
+      safeDispatch({
         data,
         error: null,
         stat: 'success'
       }),
-    []
+    [safeDispatch]
   )
 
   const setError = useCallback(
     (error: Error) =>
-      setState({
+      safeDispatch({
         error,
         data: null,
         stat: 'error'
       }),
-    []
+    [safeDispatch]
   )
   //runConfig?:{retry:()=>Promise<D>} 为什么还需要把请求的Promise通过函数传入？因为外界调用run函数传入一个Promise已经被执行了，然后将返回的结果当成参数传入了run；
   const run = useCallback(
     (promise: Promise<D>, runConfig?: { retry: () => Promise<D> }) => {
-      setState((preState) => ({
-        ...preState,
-        stat: 'loading'
-      }))
+      safeDispatch({ stat: 'loading' })
 
       if (!promise || !promise.then) {
         throw new Error('请传入Promise')
@@ -74,7 +81,7 @@ export const useAsync = <D>(
           /*
           Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
         */
-          if (mountedRef) setData(data)
+          setData(data)
           return data
         })
         .catch((error) => {
@@ -84,7 +91,7 @@ export const useAsync = <D>(
           return error
         })
     },
-    [config.throwOnError, mountedRef, setData, setError]
+    [config.throwOnError, setData, setError, safeDispatch]
   )
 
   return {

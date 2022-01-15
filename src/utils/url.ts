@@ -13,7 +13,8 @@ export const useUrlQueryParams = <K extends string>(queryKeys: K[]) => {
 
           return { ...pre, [key]: searchParams.get(key) || '' }
         }, {} as { [key in K]: string }),
-      [searchParams, queryKeys]
+      //eslint-disable-next-line react-hooks/exhaustive-deps
+      [searchParams]
     ),
 
     (params: Partial<{ [key in K]: unknown }>) => {
